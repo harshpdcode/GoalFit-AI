@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1 class="page-title">Welcome Back, <span>{{ session.get('user_name') }}</span></h1>
+<div class="accent-line"></div>
+
+<!-- ================= KPI GRID ================= -->
+
+<div class="grid">
+
+    <!-- BMI -->
+    <div class="gf-card">
+        <div class="gf-card-header">
+            <i data-lucide="scale"></i>
+            <h3>BMI Analysis</h3>
+        </div>
+        <div class="big">{{ bmi.bmi_value }}</div>
+        <p>{{ bmi.bmi_category }}</p>
+    </div>
+
+    <!-- AI Prediction -->
+    <div class="gf-card goal-extended">
+        <div class="gf-card-header">
+            <i data-lucide="brain-circuit"></i>
+            <h3>AI Prediction</h3>
+        </div>
+
+        <div class="goal-main">
+            <div class="goal-type">{{ health.goal_type }}</div>
+            <p class="goal-target">Target: {{ health.target_weight }} kg</p>
+        </div>
+
+        {% if prediction %}
+        <p class="goal-summary">
+            {{ prediction.estimated_weeks }} weeks left &mdash; expected by
+            <strong>{{ prediction.estimated_completion_date }}</strong>
+        </p>
+        <div class="goal-stats">
+            <div class="stat">
+                <span>Weeks Left</span>
+                <strong>{{ prediction.estimated_weeks }}</strong>
+            </div>
+            <div class="stat">
+                <span>Completion</span>
+                <strong>{{ prediction.estimated_completion_date }}</strong>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Steps -->
+    <div class="gf-card center">
+        <div class="gf-card-header" style="justify-content:center;">
+            <i data-lucide="footprints"></i>
+            <h3>Daily Steps</h3>
+        </div>
+
+        <div class="steps-ring" style="--percent: {{ (steps.daily_steps / 20000) * 100 }}">
+            <div class="steps-number">{{ steps.daily_steps }}</div>
+        </div>
+
+        <p>{{ steps.calories_to_burn }} kcal burned</p>
+    </div>
+
+</div>
+
+<!-- ================= LOWER DASHBOARD ================= -->
+
+<div class="dashboard-lower">
+
+    <!-- BMI + WEIGHT TREND -->
+    <div class="gf-card">
+
+        <div class="gf-card-header">
+            <i data-lucide="trending-up"></i>
+            <h3>BMI & Weight Trends</h3>
+        </div>
+
+        <div style="height:260px; position:relative;">
+            <canvas id="trendChart"></canvas>
+        </div>
+
+    </div>
+
+    <!-- GOAL PROGRESS -->
+    <div class="gf-card center">
+
+        <div class="gf-card-header" style="justify-content:center;">
+            <i data-lucide="target" class="gf-card-icon"></i>
+            <h3>Goal Progress</h3>
+        </div>
+
+        <div class="goal-chart-wrap">
+
+            <canvas id="goalChart"></canvas>
+
+            <div class="goal-center-text">
+                <span id="completionPercent">0%</span>
+                <p>Achieved</p>
+            </div>
+
+        </div>
+
+    </div>
+    <a href="{{ url_for('diet.diet_plan') }}" class="card-link">
+
+    <div class="gf-card">
+
+        <div class="gf-card-header">
+            <i data-lucide="salad" class="gf-card-icon"></i>
+            <h3>Diet Plan</h3>
+        </div>
+
+        <div class="big">{{ meal_counts.total_meals }}</div>
+        <p>Meals Available</p>
+
+    </div>
+
+</a>
+
+<a href="{{ url_for('workout.workout_plan') }}" class="card-link">
+
+    <div class="gf-card">
+
+        <div class="gf-card-header">
+            <i data-lucide="dumbbell" class="gf-card-icon"></i>
+            <h3>Workouts</h3>
+        </div>
+
+        <div class="big">{{ workout.total_exercises }}</div>
+        <p>Exercises</p>
+
+    </div>
+
+</a>
+<div class="gf-card profile-card">
+
+    <div class="gf-card-header">
+        <i data-lucide="user" class="gf-card-icon"></i>
+        <h3>Profile Snapshot</h3>
+    </div>
+
+    <div class="profile-grid">
+
+        <div class="profile-item">
+            <span>Height</span>
+            <strong>{{ health.height_cm }} cm</strong>
+        </div>
+
+        <div class="profile-item">
+            <span>Weight</span>
+            <strong>{{ health.weight_kg }} kg</strong>
+        </div>
+
+        <div class="profile-item">
+            <span>Target</span>
+            <strong>{{ health.target_weight }} kg</strong>
+        </div>
+
+        <div class="profile-item">
+            <span>Activity</span>
+            <strong>{{ health.activity_level }}</strong>
+        </div>
+
+        <div class="profile-item">
+            <span>Diet</span>
+            <strong>{{ health.diet_preference }}</strong>
+        </div>
+
+        <div class="profile-item">
+            <span>BMR</span>
+            <strong>
+                {{ health.bmr if health.bmr else '—' }} kcal
+            </strong>
+        </div>
+
+    </div>
+
+</div>
+
+    <!-- MOTIVATION TIP -->
+    <div class="gf-card tip-card">
+        <div class="gf-card-header">
+            <i data-lucide="zap" class="gf-card-icon"></i>
+            <h3>Quick Tip</h3>
+        </div>
+        <p style="color:#d1d5db; padding:0 10px; line-height:1.5;">
+            Stay consistent! Log your weight daily and keep hydrated to
+            accelerate your progress. You’ve got this 💪
+        </p>
+    </div>
+
+</div>
+
+<!-- ================= LIBRARIES ================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<!-- ================= CHART SCRIPT ================= -->
+
+<script>
+    $(document).ready(function () {
+
+        lucide.createIcons();
+
+        $.getJSON("/dashboard-progress-data", function (data) {
+
+            if (!data || !data.weights || data.weights.length === 0) {
+                $("#trendChart").parent().html(
+                    "<p style='text-align:center;color:#64748b;padding-top:100px;'>No tracking data available.</p>"
+                );
+                return;
+            }
+
+            const labels = data.weights.map(w =>
+                new Date(w.log_date).toLocaleDateString()
+            );
+
+            const weightValues = data.weights.map(w => w.weight_kg);
+            const bmiValues = data.bmi.map(b => b.bmi_value);
+
+            /* ===== BMI + WEIGHT COMBINED CHART ===== */
+
+            new Chart(document.getElementById("trendChart"), {
+
+                type: "line",
+
+                data: {
+                    labels: labels,
+                    datasets: [
+
+                        {
+                            label: "Weight (kg)",
+                            data: weightValues,
+                            borderColor: "#12d6c5",
+                            backgroundColor: "rgba(18,214,197,0.15)",
+                            tension: 0.4,
+                            fill: true
+                        },
+
+                        {
+                            label: "BMI",
+                            data: bmiValues,
+                            borderColor: "#38bdf8",
+                            backgroundColor: "rgba(56,189,248,0.12)",
+                            tension: 0.4,
+                            fill: true
+                        }
+
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: "#9aa4b2" } }
+                    },
+                    scales: {
+                        x: { ticks: { color: "#6b7280" } },
+                        y: { ticks: { color: "#6b7280" } }
+                    }
+                }
+
+            });
+
+            /* ===== GOAL COMPLETION ===== */
+
+
+
+        });
+
+    });
+</script>
+
+<script>
+
+    $(document).ready(function () {
+
+        $.getJSON("/dashboard-progress-data", function (data) {
+
+            const weightValues = data.weights.map(w => w.weight_kg);
+
+            const startWeight = parseFloat("{{ health.weight_kg }}");
+            const targetWeight = parseFloat("{{ health.target_weight }}");
+
+            const currentWeight = weightValues.length
+                ? weightValues[weightValues.length - 1]
+                : startWeight;
+
+            let completion = 0;
+
+            if (startWeight !== targetWeight) {
+                completion =
+                    ((startWeight - currentWeight) /
+                        (startWeight - targetWeight)) * 100;
+            }
+
+            completion = Math.max(0, Math.min(100, Math.round(completion)));
+
+            $("#completionPercent").text(completion + "%");
+
+
+            /* ===== ARC GAUGE ===== */
+
+            new Chart(document.getElementById("goalChart"), {
+
+                type: "doughnut",
+
+                data: {
+                    datasets: [{
+                        data: [completion, 100 - completion],
+                        backgroundColor: [
+                            "#12d6c5",
+                            "rgba(255,255,255,0.06)"
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+
+                options: {
+
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    rotation: -90 * Math.PI / 180,   // Start top center
+                    circumference: 180 * Math.PI / 180, // Half circle
+
+                    cutout: "75%",
+
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { enabled: false }
+                    }
+
+                }
+
+            });
+
+        });
+
+    });
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2 class="text-3xl font-bold mb-6">Weekly Workout Split</h2>
+
+<div class="grid md:grid-cols-3 gap-6">
+
+{% for day in plan %}
+
+<div class="glass p-5 rounded-xl text-center">
+    <h3 class="text-xl font-bold">
+        {{ day.day_name }}
+    </h3>
+
+    <p class="text-cyan-400 mt-2">
+        {{ day.muscle_group }}
+    </p>
+</div>
+
+{% endfor %}
+
+</div>
+
+{% endblock %}

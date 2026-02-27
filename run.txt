@@ -1,0 +1,152 @@
+venv\Scripts\activate
+
+user:test@goalfit.ai
+password:1234
+
+user:nonveg@goalfit.ai
+password:1234
+
+
+workout plan 
+
+Chest
+Push Ups: Beginner bodyweight exercise focused on the chest.
+
+Dumbbell Press: Intermediate move pressing dumbbells upward on a bench or floor.
+
+Bench Press: Advanced barbell exercise for maximum strength.
+
+Back
+Superman Hold: Beginner bodyweight hold lying prone to strengthen the lower back.
+
+Resistance Band Rows: Intermediate pull movement using a band.
+
+Lat Pulldown: Intermediate machine-based exercise for upper back width.
+
+Shoulders
+Arm Circles: Beginner bodyweight rotation for mobility.
+
+Dumbbell Shoulder Press: Intermediate overhead pressing movement.
+
+Machine Shoulder Press: Advanced controlled pressing using a gym machine.
+
+Biceps
+Bicep Curls: Beginner dumbbell upward curling movement.
+
+Resistance Band Curl: Beginner high-repetition curling using a band.
+
+Barbell Curl: Advanced heavy curling for bicep thickness.
+
+Triceps
+Tricep Dips: Beginner move using chair support to lower and lift the body.
+
+Overhead Dumbbell Extension: Intermediate overhead stretch and extension.
+
+Cable Pushdown: Advanced machine-based downward push.
+
+Abs
+Plank: Beginner static hold for core stability.
+
+Bicycle Crunch: Intermediate alternating elbow-to-knee crunch.
+
+Cable Crunch: Advanced weighted crunch using a cable machine.
+
+Legs (Quadriceps)
+Bodyweight Squats: Beginner hip-lowering movement.
+
+Dumbbell Squats: Intermediate weighted squat holding dumbbells.
+
+Barbell Squats: Advanced heavy compound lift with a barbell.
+
+Cardio / Full Body
+Jump Rope: Beginner continuous jumping for fat loss.
+
+Running: Beginner steady outdoor run.
+
+Cycling: Intermediate steady-pace cycling for endurance.
+
+
+
+Here is the organized list of your meals:
+
+Breakfast
+Oatmeal Power Bowl: Oats, milk, banana, and almonds.
+
+Paneer Veg Sandwich: Grilled slices with a paneer and vegetable stuffing.
+
+Lunch
+Quinoa Veg Bowl: Boiled quinoa tossed with sautéed seasonal vegetables.
+
+Brown Rice & Dal: Classic comfort meal with fiber-rich brown rice and protein-packed lentils.
+
+Dinner
+Grilled Paneer Salad: Fresh lettuce and greens topped with cubes of grilled paneer.
+
+Veg Soup & Roti: Hearty vegetable soup served with whole wheat flatbread.
+
+Snacks
+Roasted Chickpeas: Crispy, spiced chickpeas.
+
+Fruit & Nut Mix: Fresh apple slices paired with crunchy almonds.
+
+
+
+SET SQL_SAFE_UPDATES = 1;
+
+git add .
+git commit -m "Updated DB connection"
+git push
+
+
+-> Insert one test user:
+
+INSERT INTO users (id, name, email, password)
+VALUES
+(1, 'Harsh Pandya', 'harsh@goalfit.ai', '123');
+
+INSERT INTO user_health
+(user_id, age, gender, height_cm, weight_kg, activity_level, goal_type, target_weight, diet_preference)
+VALUES
+(1, 23, 'Male', 175, 82, 'Moderate', 'Weight Loss', 72, 'Vegetarian');
+
+INSERT INTO bmi_records
+(user_id, bmi_value, bmi_category, recorded_date)
+VALUES
+(1, 26.8, 'Overweight', '2026-01-15'),
+(1, 26.2, 'Overweight', '2026-01-25'),
+(1, 25.7, 'Overweight', '2026-02-05'),
+(1, 25.1, 'Overweight', '2026-02-15'),
+(1, 24.6, 'Normal', '2026-02-25');
+
+INSERT INTO progress_logs
+(user_id, weight_kg, log_date)
+VALUES
+(1, 82, '2026-01-15'),
+(1, 81, '2026-01-25'),
+(1, 80, '2026-02-05'),
+(1, 79, '2026-02-15'),
+(1, 78, '2026-02-25');
+
+INSERT INTO goal_predictions
+(user_id, weekly_change_rate, estimated_weeks, estimated_completion_date)
+VALUES
+(1, 0.8, 12, '2026-05-20');
+
+INSERT INTO step_recommendations
+(user_id, daily_steps, calories_to_burn, distance_km)
+VALUES
+(1, 8000, 320, 6.2);
+
+
+->delete every users:
+
+SET FOREIGN_KEY_CHECKS = 0;
+
+TRUNCATE TABLE progress_logs;
+TRUNCATE TABLE step_recommendations;
+TRUNCATE TABLE goal_predictions;
+TRUNCATE TABLE bmi_records;
+TRUNCATE TABLE user_health;
+TRUNCATE TABLE users;
+
+SET FOREIGN_KEY_CHECKS = 1;

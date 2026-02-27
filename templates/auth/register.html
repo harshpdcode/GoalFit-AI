@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block auth_content %}
+
+<div class="auth-container">
+
+    <!-- LEFT IMAGE PANEL -->
+    <div class="auth-left register-bg">
+
+        <div class="auth-overlay"></div>
+
+        <div class="auth-left-content">
+            <h1>
+                BUILD YOUR <span>PROTOCOL</span>
+            </h1>
+            <p>
+                Start your transformation journey
+                with AI-driven fitness intelligence.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT FORM PANEL -->
+    <div class="auth-right">
+
+        <div class="auth-form">
+
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <span>GOALFIT AI</span>
+            </div>
+
+            <h2>CREATE ACCOUNT</h2>
+            <p class="sub">Initialize your fitness protocol</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-msg">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="input-box">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    INITIALIZE PROTOCOL →
+                </button>
+
+            </form>
+
+            <p class="switch">
+                Already registered?
+                <a href="/login">Sign In</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

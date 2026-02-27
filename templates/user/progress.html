@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="progress-page">
+
+    <!-- HEADER -->
+    <div class="page-head">
+        <h1>Weight Progress</h1>
+        <p>Each entry — a footprint toward transformation.</p>
+    </div>
+
+    <!-- ADD ENTRY -->
+    <div class="progress-card small weight-entry-card">
+
+        <form method="POST">
+
+            <div class="weight-header">
+                <i data-lucide="scale"></i>
+                <label>Add Current Weight (kg)</label>
+            </div>
+
+            <div class="weight-form">
+                <input type="number" step="0.1"
+                       name="weight" placeholder="e.g., 75.5" required>
+
+                <button type="submit" class="submit-btn">
+                    <i data-lucide="plus"></i>
+                    Add
+                </button>
+            </div>
+
+        </form>
+
+    </div>
+
+    <!-- GOAL PROGRESS -->
+    {% if health and logs %}
+
+    {% set current = logs[-1].weight_kg %}
+    {% set start = health.weight_kg %}
+    {% set target = health.target_weight %}
+
+    {% set percent =
+        ((start - current)/(start - target))*100
+        if start != target else 100 %}
+
+    <div class="progress-card">
+
+        <h3>Goal Completion</h3>
+
+        <div class="progress-bar">
+            <div class="progress-fill"
+                 style="width:{{ percent|round(0) }}%">
+            </div>
+        </div>
+
+        <p class="progress-text">
+            {{ percent|round(1) }}% Achieved
+        </p>
+
+    </div>
+
+    {% endif %}
+
+    <!-- BMI & WEIGHT TREND CHART -->
+    {% if logs and bmi_logs %}
+    <div class="progress-card">
+
+        <div class="gf-card-header">
+            <i data-lucide="trending-up"></i>
+            <h3>BMI & Weight Trends</h3>
+        </div>
+
+        <div style="height:260px; position:relative;">
+            <canvas id="trendChart"></canvas>
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- WEIGHT PROGRESS CHART -->
+    {% if logs %}
+    <div class="progress-card">
+
+        <div class="gf-card-header">
+            <i data-lucide="trending-up"></i>
+            <h3>Weight History</h3>
+        </div>
+
+        <div style="height:260px; position:relative;">
+            <canvas id="weightChart"></canvas>
+        </div>
+
+    </div>
+    {% endif %}
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+
+        lucide.createIcons();
+
+        $.getJSON("/dashboard-progress-data", function (data) {
+
+            if (!data || !data.weights || data.weights.length === 0) {
+                $("#trendChart").parent().html(
+                    "<p style='text-align:center;color:#64748b;padding-top:100px;'>No tracking data available.</p>"
+                );
+                return;
+            }
+
+            const labels = data.weights.map(w =>
+                new Date(w.log_date).toLocaleDateString()
+            );
+
+            const weightValues = data.weights.map(w => w.weight_kg);
+            const bmiValues = data.bmi.map(b => b.bmi_value);
+
+            /* ===== BMI + WEIGHT COMBINED CHART ===== */
+
+            new Chart(document.getElementById("trendChart"), {
+
+                type: "line",
+
+                data: {
+                    labels: labels,
+                    datasets: [
+
+                        {
+                            label: "Weight (kg)",
+                            data: weightValues,
+                            borderColor: "#12d6c5",
+                            backgroundColor: "rgba(18,214,197,0.15)",
+                            tension: 0.4,
+                            fill: true
+                        },
+
+                        {
+                            label: "BMI",
+                            data: bmiValues,
+                            borderColor: "#38bdf8",
+                            backgroundColor: "rgba(56,189,248,0.12)",
+                            tension: 0.4,
+                            fill: true
+                        }
+
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: "#9aa4b2" } }
+                    },
+                    scales: {
+                        x: { ticks: { color: "#6b7280" } },
+                        y: { ticks: { color: "#6b7280" } }
+                    }
+                }
+
+            });
+
+            /* ===== WEIGHT HISTORY CHART ===== */
+
+            new Chart(document.getElementById("weightChart"), {
+
+                type: "bar",
+
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: "Weight (kg)",
+                        data: weightValues,
+                        backgroundColor: "#12d6c5",
+                        borderColor: "#0d9488",
+                        borderWidth: 1
+                    }]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { labels: { color: "#9aa4b2" } }
+                    },
+                    scales: {
+                        x: { ticks: { color: "#6b7280" } },
+                        y: { ticks: { color: "#6b7280" } }
+                    }
+                }
+
+            });
+
+        });
+
+    });
+</script>
+{% endblock %}

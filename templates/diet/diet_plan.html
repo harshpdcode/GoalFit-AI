@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="diet-header">
+    <p class="diet-sub">Nutrition</p>
+    <h1 class="diet-title">Diet Plan</h1>
+
+    <div class="diet-tags">
+        <span class="tag vegan">{{ diet_pref }}</span>
+        <span class="tag goal">{{ goal }}</span>
+        <span class="tag bmi">{{ bmi }}</span>
+    </div>
+</div>
+
+<div class="meal-tabs">
+    <button class="tab active" data-meal="breakfast">Breakfast</button>
+    <button class="tab" data-meal="lunch">Lunch</button>
+    <button class="tab" data-meal="dinner">Dinner</button>
+    <button class="tab" data-meal="snacks">Snacks</button>
+</div>
+
+<div class="meal-grid">
+
+    {% for meal_time in ["breakfast","lunch","dinner","snacks"] %}
+
+    {% for meal in meals[meal_time] %}
+
+    <div class="meal-card" data-meal="{{ meal_time }}">
+
+        <div class="meal-img">
+
+            <img src="{{ url_for('static', filename=meal.image_url) }}" alt="{{ meal.meal_name }}">
+
+            <span class="kcal-badge">
+                🔥 {{ meal.calories }} kcal
+            </span>
+
+        </div>
+
+        <div class="meal-info">
+
+            <h3>{{ meal.meal_name }}</h3>
+
+            <div class="meal-meta">
+                <span>{{ meal.diet_type }}</span>
+                <span>{{ meal.cost_category }}</span>
+                <span>{{ meal.quantity }}</span>
+            </div>
+
+            <div class="macros">
+                <div>
+                    <strong>{{ meal.protein or 0 }}g</strong>
+                    <p>Protein</p>
+                </div>
+
+                <div>
+                    <strong>{{ meal.carbs or 0 }}g</strong>
+                    <p>Carbs</p>
+                </div>
+
+                <div>
+                    <strong>{{ meal.fat or 0 }}g</strong>
+                    <p>Fat</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    {% endfor %}
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const tabs = document.querySelectorAll(".tab");
+        const cards = document.querySelectorAll(".meal-card");
+
+        function filterMeals(type) {
+            cards.forEach(card => {
+                card.style.display = (card.dataset.meal === type) ? "block" : "none";
+            });
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                filterMeals(tab.dataset.meal);
+            });
+        });
+
+        filterMeals("breakfast");
+    });
+</script>
+
+{% endblock %}

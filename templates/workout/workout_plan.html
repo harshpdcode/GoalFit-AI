@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- ===== HEADER ===== -->
+
+<div class="workout-header">
+
+    <p class="workout-sub">Training</p>
+    <h1 class="workout-title">Workout Plan</h1>
+
+    <div class="workout-tags">
+        <span class="tag goal">{{ goal }}</span>
+        <span class="tag activity">{{ activity }}</span>
+    </div>
+
+</div>
+
+
+<!-- ===== MUSCLE FILTER ===== -->
+
+<div class="muscle-tabs">
+
+    {% for muscle in workouts.keys() %}
+        <button class="muscle-tab"
+                data-muscle="{{ muscle }}">
+            {{ muscle }}
+        </button>
+    {% endfor %}
+
+</div>
+
+
+<!-- ===== WORKOUT GRID ===== -->
+
+<div class="workout-grid">
+
+{% for muscle, ex_list in workouts.items() %}
+{% for ex in ex_list %}
+
+<div class="workout-card"
+     data-muscle="{{ muscle }}">
+
+    <!-- IMAGE -->
+    <div class="workout-img">
+
+        {% set img = ex.image_url %}
+        {# strip leading folders, especially "workout/" prefix #}
+        {% if img.startswith('workout/') %}
+            {% set img = img.split('/',1)[1] %}
+        {% endif %}
+        {% if not img.startswith('/static') %}
+            {% set img = url_for('static', filename='images/workout/' + img.lstrip('/')) %}
+        {% endif %}
+        <a href="{{ ex.video_url }}" target="_blank">
+            <img src="{{ img }}" alt="{{ ex.exercise_name }}">
+        </a>
+
+        <a href="{{ ex.video_url }}"
+           target="_blank"
+           class="play-btn">▶</a>
+
+        <span class="difficulty {{ ex.difficulty_level|lower }}">
+            {{ ex.difficulty_level }}
+        </span>
+
+    </div>
+
+    <!-- INFO -->
+    <div class="workout-info">
+
+        <h3>{{ ex.exercise_name }}</h3>
+
+        <div class="meta">
+
+            <span>⏱ {{ ex.duration_minutes }} min</span>
+            <span>🔥 {{ ex.calories_burn }} kcal</span>
+            <span>🏋 {{ ex.environment_type }}</span>
+
+        </div>
+
+        <div class="sets">
+
+            <span>{{ ex.equipment_required }}</span>
+
+        </div>
+
+        <a href="{{ ex.video_url }}"
+           target="_blank"
+           class="instructions">
+           Show instructions
+        </a>
+
+    </div>
+
+</div>
+
+{% endfor %}
+{% endfor %}
+
+</div>
+
+
+<!-- ===== FILTER SCRIPT ===== -->
+
+<script>
+
+const tabs = document.querySelectorAll(".muscle-tab");
+const cards = document.querySelectorAll(".workout-card");
+
+tabs.forEach(tab => {
+
+    tab.addEventListener("click", () => {
+
+        tabs.forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        const muscle = tab.dataset.muscle;
+
+        cards.forEach(card => {
+
+            if(card.dataset.muscle === muscle){
+                card.style.display = "block";
+            } else {
+                card.style.display = "none";
+            }
+
+        });
+
+    });
+
+});
+
+// Default select first
+if(tabs.length){
+    tabs[0].click();
+}
+
+</script>
+
+{% endblock %}

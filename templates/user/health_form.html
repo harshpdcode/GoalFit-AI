@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block content %}
+
+{% if session.get('first_time_login') %}
+<div class="modal-overlay" id="firstTimeModal">
+    <div class="first-login-modal">
+        <div class="modal-icon">⚡</div>
+        <h2>Welcome to GoalFit AI</h2>
+        <p>Let's set up your fitness profile to get personalized recommendations!</p>
+        <p class="modal-subtitle">Complete this form to unlock your dashboard.</p>
+    </div>
+</div>
+{% endif %}
+
+<div class="profile-page">
+
+    <!-- HEADER -->
+    <div class="page-head">
+        <h1>Health Profile</h1>
+        <p>Shape your journey — body, habit, and intention aligned.</p>
+    </div>
+
+    {% if health %}
+    <!-- CURRENT STATS -->
+    <div class="profile-card">
+        <h3 style="margin-bottom:20px;display:flex;align-items:center;gap:8px;">
+            <i data-lucide="activity"></i>
+            Your Current Stats
+        </h3>
+        <div class="profile-grid">
+            <div class="profile-item">
+                <span>Age</span>
+                <strong>{{ health.age }} years</strong>
+            </div>
+            <div class="profile-item">
+                <span>Height</span>
+                <strong>{{ health.height_cm }} cm</strong>
+            </div>
+            <div class="profile-item">
+                <span>Current Weight</span>
+                <strong>{{ health.weight_kg }} kg</strong>
+            </div>
+            <div class="profile-item">
+                <span>Target Weight</span>
+                <strong>{{ health.target_weight }} kg</strong>
+            </div>
+            <div class="profile-item">
+                <span>Goal</span>
+                <strong>{{ health.goal_type }}</strong>
+            </div>
+            <div class="profile-item">
+                <span>Activity Level</span>
+                <strong>{{ health.activity_level }}</strong>
+            </div>
+            <div class="profile-item">
+                <span>Diet Preference</span>
+                <strong>{{ health.diet_preference }}</strong>
+            </div>
+            <div class="profile-item">
+                <span>Gender</span>
+                <strong>{{ health.gender }}</strong>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- FORM CARD -->
+    <form method="POST" class="profile-card">
+
+        <div class="profile-grid">
+
+            <!-- Age -->
+            <div class="input-group">
+                <label>Age</label>
+                <div class="number-control">
+                    <button type="button" class="dec-btn">&#8722;</button>
+                    <input type="number" name="age" required
+                           value="{{health.age if health else ''}}">
+                    <button type="button" class="inc-btn">&#43;</button>
+                </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="input-group">
+                <label>Gender</label>
+                <select name="gender" required>
+                    <option value="Male" {% if health and health.gender=='Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if health and health.gender=='Female' %}selected{% endif %}>Female</option>
+                </select>
+            </div>
+
+            <!-- Height -->
+            <div class="input-group">
+                <label>Height (cm)</label>
+                <div class="number-control">
+                    <button type="button" class="dec-btn">&#8722;</button>
+                    <input type="number" step="0.1" name="height" required
+                           value="{{ health.height_cm if health else '' }}">
+                    <button type="button" class="inc-btn">&#43;</button>
+                </div>
+            </div>
+
+            <!-- Weight -->
+            <div class="input-group">
+                <label>Weight (kg)</label>
+                <div class="number-control">
+                    <button type="button" class="dec-btn">&#8722;</button>
+                    <input type="number" step="0.1" name="weight" required
+                           value="{{ health.weight_kg if health else '' }}">
+                    <button type="button" class="inc-btn">&#43;</button>
+                </div>
+            </div>
+
+            <!-- Activity -->
+            <div class="input-group">
+                <label>Activity Level</label>
+                <select name="activity_level" required>
+                    <option value="Sedentary" {% if health and health.activity_level=='Sedentary' %}selected{% endif %}>Sedentary</option>
+                    <option value="Moderate" {% if health and health.activity_level=='Moderate' %}selected{% endif %}>Moderate</option>
+                    <option value="Active" {% if health and health.activity_level=='Active' %}selected{% endif %}>Active</option>
+                </select>
+            </div>
+
+            <!-- Goal -->
+            <div class="input-group">
+                <label>Goal</label>
+                <select name="goal_type" required>
+                    <option value="Weight Loss" {% if health and health.goal_type=='Weight Loss' %}selected{% endif %}>Weight Loss</option>
+                    <option value="Weight Gain" {% if health and health.goal_type=='Weight Gain' %}selected{% endif %}>Weight Gain</option>
+                    <option value="Maintenance" {% if health and health.goal_type=='Maintenance' %}selected{% endif %}>Maintenance</option>
+                </select>
+            </div>
+
+            <!-- Target -->
+            <div class="input-group">
+                <label>Target Weight</label>
+                <div class="number-control">
+                    <button type="button" class="dec-btn">&#8722;</button>
+                    <input type="number" step="0.1" name="target_weight" required
+                           value="{{ health.target_weight if health else '' }}">
+                    <button type="button" class="inc-btn">&#43;</button>
+                </div>
+            </div>
+
+            <!-- Diet -->
+            <div class="input-group">
+                <label>Diet Preference</label>
+                <select name="diet_preference" required>
+                    <option value="Vegetarian" {% if health and health.diet_preference=='Vegetarian' %}selected{% endif %}>Vegetarian</option>
+                    <option value="Eggetarian" {% if health and health.diet_preference=='Eggetarian' %}selected{% endif %}>Eggetarian</option>
+                    <option value="Non-Vegetarian" {% if health and health.diet_preference=='Non-Vegetarian' %}selected{% endif %}>Non-Vegetarian</option>
+                    <option value="Vegan" {% if health and health.diet_preference=='Vegan' %}selected{% endif %}>Vegan</option>
+                </select>
+            </div>
+
+        </div>
+
+        <button type="submit" class="save-btn">
+            Save Profile
+        </button>
+
+    </form>
+
+</div>
+
+<script src="https://unpkg.com/lucide@latest"></script>
+<script>
+    lucide.createIcons();
+
+    // automatically fade out welcome modal after a few seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('firstTimeModal');
+        if (modal) {
+            setTimeout(() => {
+                modal.style.transition = 'opacity 0.6s ease';
+                modal.style.opacity = '0';
+                setTimeout(() => modal.remove(), 600);
+            }, 3000);
+        }
+
+        // increment / decrement handlers
+        document.querySelectorAll('.number-control').forEach(wrapper => {
+            const input = wrapper.querySelector('input');
+            const dec = wrapper.querySelector('.dec-btn');
+            const inc = wrapper.querySelector('.inc-btn');
+            const step = parseFloat(input.getAttribute('step')) || 1;
+            dec.addEventListener('click', () => {
+                let val = parseFloat(input.value) || 0;
+                input.value = (val - step).toFixed( input.getAttribute('step') ? 1 : 0 );
+            });
+            inc.addEventListener('click', () => {
+                let val = parseFloat(input.value) || 0;
+                input.value = (val + step).toFixed( input.getAttribute('step') ? 1 : 0 );
+            });
+        });
+    });
+</script>
+
+{% endblock %}

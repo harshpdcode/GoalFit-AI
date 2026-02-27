@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block auth_content %}
+
+<div class="auth-container">
+
+    <!-- LEFT IMAGE PANEL -->
+    <div class="auth-left login-bg">
+
+        <div class="auth-overlay"></div>
+
+        <div class="auth-left-content">
+            <h1>
+                UPGRADE YOUR <span>CHASSIS</span>
+            </h1>
+            <p>
+                AI-powered fitness intelligence.
+                Personalized diet, workout plans,
+                and goal predictions.
+            </p>
+        </div>
+
+    </div>
+
+
+    <!-- RIGHT FORM PANEL -->
+    <div class="auth-right">
+
+        <div class="auth-form">
+
+            <div class="brand">
+                <div class="brand-icon">⚡</div>
+                <span>GOALFIT AI</span>
+            </div>
+
+            <h2>SIGN IN</h2>
+            <p class="sub">Access your fitness command center</p>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="flash-msg">
+                {{ message }}
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+
+                <div class="input-box">
+                    <label>Email</label>
+                    <input type="email" name="email" required>
+                </div>
+
+                <div class="input-box">
+                    <label>Password</label>
+                    <input type="password" name="password" required>
+                </div>
+
+                <button type="submit" class="auth-btn">
+                    ENTER THE SYSTEM →
+                </button>
+
+            </form>
+
+            <p class="switch">
+                New here?
+                <a href="/register">Create Account</a>
+            </p>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
